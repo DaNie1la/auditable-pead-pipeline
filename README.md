@@ -5,6 +5,7 @@
 - 项目展示与中英文简历表述：[PORTFOLIO.md](PORTFOLIO.md)
 - 复现命令与验收点：[REPRODUCIBILITY.md](REPRODUCIBILITY.md)
 - 多人项目归属、AI 辅助与数据许可边界：[ATTRIBUTION.md](ATTRIBUTION.md)
+- 工作区目录地图与可公开范围：[WORKSPACE_MAP.md](WORKSPACE_MAP.md)
 
 本仓库展示的个人贡献是后续的数据重建、模型审计与可复现工程，不代表对原多人论文的独立署名或所有权主张。
 

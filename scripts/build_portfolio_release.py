@@ -16,8 +16,10 @@ ROOT_FILES = [
     "ATTRIBUTION.md",
     "REPRODUCIBILITY.md",
     "GITHUB_PUBLISHING.md",
+    "WORKSPACE_MAP.md",
     "pytest.ini",
     "requirements.txt",
+    "requirements-test.txt",
     "requirements-phase3.txt",
     "requirements-phase4.txt",
     "requirements-phase5.txt",
@@ -70,6 +72,8 @@ def main() -> None:
     RELEASE_ROOT.parent.mkdir(parents=True, exist_ok=True)
     for name in ROOT_FILES:
         copy_file(Path(name))
+    for path in sorted((PROJECT_ROOT / ".github" / "workflows").glob("*.yml")):
+        copy_file(path.relative_to(PROJECT_ROOT))
     for path in sorted((PROJECT_ROOT / "src" / "pead_pipeline").glob("*.py")):
         copy_file(path.relative_to(PROJECT_ROOT))
     for path in sorted((PROJECT_ROOT / "scripts").glob("run_phase*.py")):
