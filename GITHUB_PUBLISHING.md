@@ -9,7 +9,7 @@ Only publish the contents of `deliverables/github/pead-portfolio-github.zip`. Do
 ## Suggested repository settings
 
 - Repository name: `auditable-pead-pipeline`
-- Description: `Leakage-safe reconstruction and audit of an earnings-call PEAD prediction pipeline using FinBERT and point-in-time financial features.`
+- Description: `Auditable earnings-call PEAD pipeline using FinBERT, event-date-filtered financial features, and chronological model validation.`
 - Topics: `financial-nlp`, `finbert`, `event-study`, `machine-learning`, `reproducibility`, `model-audit`, `pead`
 - Visibility: public, subject to the collaboration and data-licensing boundary above
 - License: leave unlicensed until ownership of all inherited code and materials is confirmed

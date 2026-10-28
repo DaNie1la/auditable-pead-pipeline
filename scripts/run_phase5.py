@@ -196,11 +196,79 @@ def fit_clustered_ols(
     return rows, summary
 
 
+def select_models_on_prior_years(
+    raw: pd.DataFrame, config: ModelingConfig
+) -> tuple[pd.DataFrame, dict[str, str]]:
+    """Select each target's model using only 2020 and 2021 validation events."""
+    rows: list[dict[str, object]] = []
+    feature_sets = model_feature_sets()
+    model_jobs = [
+        ("XGBoost", "financial"),
+        ("XGBoost", "additive"),
+        ("XGBoost", "interaction"),
+        ("LightGBM", "interaction"),
+        ("CatBoost", "interaction"),
+    ]
+    for year in (2020, 2021):
+        fold_config = ModelingConfig(
+            train_end=f"{year - 1}-12-31", test_start=f"{year}-01-01"
+        )
+        timestamps = pd.to_datetime(raw["event_timestamp_et"], utc=True)
+        local_years = timestamps.dt.tz_convert("America/New_York").dt.year
+        fold_source = raw.loc[local_years.le(year)].copy()
+        fold, _ = prepare_modeling_frame(fold_source, fold_config)
+        validation_start = pd.Timestamp(f"{year}-01-01")
+        next_year = pd.Timestamp(f"{year + 1}-01-01")
+        validation_cutoff = next_year - pd.Timedelta(config.label_embargo_days, unit="D")
+        training = fold.loc[fold["sample_split"].eq("train")].copy()
+        validation = fold.loc[
+            fold["sample_split"].eq("test") & fold["event_date"].le(validation_cutoff)
+        ].copy()
+        if training.empty or validation.empty:
+            raise RuntimeError(f"empty model-selection fold for {year}")
+        for target in TARGETS:
+            y_train = clip_training_target(
+                training[target].astype(float), config.winsor_lower, config.winsor_upper
+            )
+            predictions: dict[str, np.ndarray] = {}
+            for model_name, specification in model_jobs:
+                estimator = build_estimators(config)[model_name]
+                features = feature_sets[specification]
+                estimator.fit(training[features], y_train)
+                name = (
+                    f"{model_name}_{specification}"
+                    if model_name == "XGBoost" else model_name
+                )
+                predictions[name] = np.asarray(estimator.predict(validation[features]))
+            predictions["TIDE"] = np.mean(
+                [predictions[name] for name in ("XGBoost_interaction", "LightGBM", "CatBoost")],
+                axis=0,
+            )
+            for name, predicted in predictions.items():
+                metrics = prediction_metrics(
+                    validation[target], pd.Series(predicted, index=validation.index),
+                    validation["event_month"],
+                )
+                rows.append({"target": target, "model": name, "validation_year": year, **metrics})
+    table = pd.DataFrame(rows)
+    ranking = table.groupby(["target", "model"], as_index=False).agg(
+        validation_rank_ic=("monthly_rank_ic_mean", "mean")
+    )
+    selected = {
+        target: group.sort_values(
+            ["validation_rank_ic", "model"], ascending=[False, True]
+        ).iloc[0]["model"]
+        for target, group in ranking.groupby("target")
+    }
+    return table, selected
+
+
 def main() -> None:
     args = parse_args()
     config = ModelingConfig()
     args.processed_dir.mkdir(parents=True, exist_ok=True)
     raw = pd.read_csv(args.input, low_memory=False)
+    validation_metrics, selected_models = select_models_on_prior_years(raw, config)
     frame, transformer = prepare_modeling_frame(raw, config)
     train = frame[frame["sample_split"].eq("train")].copy()
     test = frame[frame["sample_split"].eq("test")].copy()
@@ -208,6 +276,7 @@ def main() -> None:
         raise RuntimeError("chronological split produced an empty train or test sample")
 
     paths = {
+        "validation_metrics": args.processed_dir / "phase5_validation_metrics.csv",
         "modeling_sample": args.processed_dir / "phase5_modeling_sample.csv",
         "transform_parameters": args.processed_dir / "phase5_transform_parameters.csv",
         "target_clip_bounds": args.processed_dir / "phase5_target_clip_bounds.csv",
@@ -220,6 +289,8 @@ def main() -> None:
         "importance": args.processed_dir / "phase5_feature_importance.csv",
         "portfolio_sorts": args.processed_dir / "phase5_portfolio_sorts.csv",
     }
+
+    validation_metrics.to_csv(paths["validation_metrics"], index=False)
 
     frame.to_csv(paths["modeling_sample"], index=False)
     transformer.export_parameters().to_csv(paths["transform_parameters"], index=False)
@@ -423,6 +494,9 @@ def main() -> None:
             )
 
     metrics = pd.DataFrame(metric_rows)
+    metrics["selected_on_validation"] = metrics.apply(
+        lambda row: row["model"] == selected_models[row["target"]], axis=1
+    )
     metrics.to_csv(paths["metrics"], index=False)
     predictions.to_csv(paths["predictions"], index=False)
     pd.DataFrame(importance_rows).to_csv(paths["importance"], index=False)
@@ -441,9 +515,9 @@ def main() -> None:
     best_by_target = {}
     for target in TARGETS:
         target_metrics = metrics[
-            metrics["target"].eq(target) & ~metrics["model"].eq("HistoricalMean")
+            metrics["target"].eq(target) & metrics["selected_on_validation"]
         ]
-        best = target_metrics.sort_values("monthly_rank_ic_mean", ascending=False).iloc[0]
+        best = target_metrics.iloc[0]
         best_by_target[target] = {
             "model": str(best["model"]),
             "rmse": float(best["rmse"]),
@@ -469,6 +543,8 @@ def main() -> None:
         "sample": {
             "all_events": int(len(frame)),
             "train_events": int(len(train)),
+            "embargoed_events": int(frame["sample_split"].eq("embargo").sum()),
+            "training_label_embargo_days": config.label_embargo_days,
             "test_events": int(len(test)),
             "train_start": str(train["event_date"].min().date()),
             "train_end": str(train["event_date"].max().date()),
@@ -486,7 +562,14 @@ def main() -> None:
             "rank_ic": "Spearman correlation; monthly mean uses test months with at least 20 events",
             "portfolio_sort": "event-month top-minus-bottom quintile diagnostic; arithmetic cumulative spread, no costs and not a tradeable overlapping-position backtest",
             "feature_importance": "common test-set permutation RMSE increase is the primary cross-model importance; native tree importances are retained only for audit",
-            "best_by_target_monthly_rank_ic": best_by_target,
+            "model_selection": "2020 and 2021 validation folds; each fold fits preprocessing and models on prior events with a 95-calendar-day CAR60 label embargo; 2022-2023 held out for final reporting",
+            "validation_months_by_year": {
+                str(year): int(validation_metrics.loc[
+                    validation_metrics["validation_year"].eq(year), "monthly_rank_ic_months"
+                ].iloc[0]) for year in (2020, 2021)
+            },
+            "selected_models": selected_models,
+            "validation_selected_test_metrics": best_by_target,
         },
         "software": {
             "pandas": pd.__version__,
@@ -510,11 +593,14 @@ def main() -> None:
         "",
         f"- 分析单位：单次业绩电话会事件。",
         f"- 训练期：{report['sample']['train_start']} 至 {report['sample']['train_end']}，{len(train):,} 条。",
+        f"- 另有 {report['sample']['embargoed_events']:,} 条临近测试边界的事件不参与预测训练，以避免 CAR60 标签跨越边界。",
         f"- 测试期：{report['sample']['test_start']} 至 {report['sample']['test_end']}，{len(test):,} 条。",
+        "- 模型规格在 2020 和 2021 年验证折上预选；各折留出 95 个日历日的 CAR60 标签缓冲期。",
+        "- 2022–2023 年测试集只用于锁定模型的最终汇报；其他模型的测试指标保留作审计，不按测试表现重新选择。",
         "- 特征缩尾和标准化参数只由训练期估计；测试期目标保持原值。",
         "- 回归为关联性分析，不支持因果推断。",
         "",
-        "## 样本外最佳月度 Rank IC",
+        "## 验证期预选模型的最终测试表现",
         "",
     ]
     for target, values in best_by_target.items():

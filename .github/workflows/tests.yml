@@ -28,4 +28,6 @@ jobs:
           python -m pip install -r requirements-test.txt
       - name: Run unit tests
         run: python -m pytest -q
+      - name: Run private-data-free integration demo
+        run: python scripts/run_synthetic_demo.py
 

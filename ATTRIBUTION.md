@@ -6,7 +6,7 @@ The original paper context was collaborative. This repository must not be used t
 
 The defensible personal portfolio claim is narrower:
 
-> Independently reconstructed and audited the PEAD data and modeling pipeline, including event-key validation, transcript segmentation, fixed-model sentiment inference, event-time market features, point-in-time fundamentals, leakage-safe evaluation, automated tests, and evidence-based reinterpretation.
+> Independently reconstructed and audited the PEAD data and modeling pipeline, including event-key validation, transcript segmentation, fixed-model sentiment inference, event-time market features, date-filtered historical fundamentals with disclosed revision risk, leakage-aware evaluation, automated tests, and evidence-based reinterpretation.
 
 Only use that claim if you can explain the implementation and methodological choices in an interview. Be ready to discuss why event time matters, why the legacy SUE proxy was invalid, how train-only transformations prevent leakage, why clustered standard errors were used, and why feature importance is not causal evidence.
 
