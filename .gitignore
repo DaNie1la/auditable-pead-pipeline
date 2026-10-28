@@ -1,0 +1,31 @@
+__pycache__/
+*.py[cod]
+.venv/
+.cache/
+.pytest_cache/
+
+# Large, cached, or redistributability-sensitive data
+data/raw/
+data/interim/
+data/models/
+data/processed/*.csv
+data/processed/*.jsonl.gz
+*.pkl
+*.zip
+
+# Collaborative manuscript and legacy private working files
+*.docx
+*.pdf
+master_dataset_multi_window.csv
+thesis_nlp_scores_new.csv
+nlp_analysis.py
+
+# Local artifacts
+portfolio_release*/
+DO_NOT_UPLOAD_privacy_audit_failed/
+private/
+deliverables/
+*.log
+.DS_Store
+Thumbs.db
+
