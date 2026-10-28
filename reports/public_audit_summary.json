@@ -1,0 +1,557 @@
+{
+  "schema_version": 1,
+  "scope": "Aggregate audit only; no event-level records or source transcripts",
+  "data_vintage_limitation": "Yahoo histories were downloaded after the studied events. Date filtering does not establish what an immutable vendor snapshot showed at event time.",
+  "reports": {
+    "phase1_data_quality": {
+      "phase": 1,
+      "source_files": {
+        "master": {
+          "size_bytes": 1893205,
+          "sha256": "3fd31cdb84196e72792135c8121a0db8eba7dadbcf1744cc040d51be3b6474fe"
+        },
+        "nlp_scores": {
+          "size_bytes": 1056319,
+          "sha256": "ea915d365000a4b79388c98cf090d41e0ad722acb78e783bc905ecefdee14b35"
+        }
+      },
+      "raw_transcripts": {
+        "exists": true,
+        "size_bytes": 888536656,
+        "rows": 18755,
+        "columns": [
+          "date",
+          "exchange",
+          "q",
+          "ticker",
+          "transcript"
+        ],
+        "valid_schema": true,
+        "error": null
+      },
+      "master": {
+        "rows": 14551,
+        "unique_tickers": 2807,
+        "ticker_corrections": 21,
+        "source_timestamps_parsed": 14551,
+        "parsed_timestamps": 14549,
+        "unparsed_timestamps": 2,
+        "timestamp_resolution": {
+          "source_timestamp": 14305,
+          "recovered_from_nlp_scores": 244,
+          "unresolved_no_candidate": 2
+        },
+        "timestamp_range": {
+          "min": "2017-11-03T08:30:00-04:00",
+          "max": "2023-02-23T11:00:00-05:00"
+        },
+        "event_groups": 13729,
+        "safe_unique_events": 13164,
+        "exact_duplicate_groups": 1,
+        "conflict_groups": 563,
+        "conflict_rows": 1384,
+        "missing_values": {
+          "event_timestamp_et": 2
+        },
+        "tail_diagnostics": {
+          "Tone_Pres": {
+            "min": -0.954552284,
+            "q01": -0.0734067205,
+            "q99": 0.4272122995,
+            "max": 0.942667145,
+            "values_outside_1_99_percentiles": true
+          },
+          "Tone_QA": {
+            "min": -0.966488409,
+            "q01": -0.8501984905,
+            "q99": 0.929785844,
+            "max": 0.943785198,
+            "values_outside_1_99_percentiles": true
+          },
+          "CAR_5": {
+            "min": -0.60559396,
+            "q01": -0.17879094350000002,
+            "q99": 0.20850863949999998,
+            "max": 0.705151263,
+            "values_outside_1_99_percentiles": true
+          },
+          "CAR_10": {
+            "min": -0.892362638,
+            "q01": -0.2398942885,
+            "q99": 0.2615133415,
+            "max": 3.499207948,
+            "values_outside_1_99_percentiles": true
+          },
+          "CAR_60": {
+            "min": -1.578667376,
+            "q01": -0.6054849904999999,
+            "q99": 0.558476008,
+            "max": 3.604744452,
+            "values_outside_1_99_percentiles": true
+          },
+          "SUE_Proxy": {
+            "min": -1.502669457,
+            "q01": -0.6645646325,
+            "q99": 0.747433409,
+            "max": 6.971417143,
+            "values_outside_1_99_percentiles": true
+          },
+          "Size": {
+            "min": 6.998412511,
+            "q01": 12.791177699999999,
+            "q99": 23.54502059,
+            "max": 24.51689073,
+            "values_outside_1_99_percentiles": true
+          },
+          "VOL": {
+            "min": 0.004136331,
+            "q01": 0.00875653,
+            "q99": 0.08940007250000001,
+            "max": 0.525062721,
+            "values_outside_1_99_percentiles": true
+          },
+          "Turnover": {
+            "min": -1.791759469,
+            "q01": 10.037862215,
+            "q99": 18.3224731,
+            "max": 20.21520835,
+            "values_outside_1_99_percentiles": true
+          }
+        }
+      },
+      "nlp_scores": {
+        "rows": 18755,
+        "unique_tickers": 2858,
+        "ticker_corrections": 31,
+        "parsed_timestamps": 18754,
+        "unparsed_timestamps": 1,
+        "timestamp_range": {
+          "min": "2017-11-03T08:30:00-04:00",
+          "max": "2023-02-23T11:00:00-05:00"
+        },
+        "event_groups": 17544,
+        "exact_duplicate_rows": 2030,
+        "duplicate_event_groups": 851,
+        "tone_conflict_groups": 9
+      },
+      "cross_file": {
+        "overlapping_event_ids": 13727,
+        "master_rows_relative_to_nlp_rows": 0.7758464409490803,
+        "row_loss_rate_from_nlp_to_master": 0.22415355905091972
+      },
+      "decisions": [
+        "Source files were not overwritten.",
+        "Conflicting event groups were excluded from the safe event table.",
+        "No conflicting row was selected as correct without source evidence.",
+        "Raw transcript absence remains an explicit dependency.",
+        "Midnight placeholders were recovered only when the NLP table supplied one unique same-ticker, same-date timestamp."
+      ]
+    },
+    "phase2_transcript_quality": {
+      "phase": 2,
+      "source": {
+        "size_bytes": 888536656,
+        "sha256": "f84a4b8073799d9b67417008bbe4001466bd006756850f1815469502bb0638d4",
+        "rows": 18755,
+        "columns": [
+          "date",
+          "exchange",
+          "q",
+          "ticker",
+          "transcript"
+        ]
+      },
+      "timestamps": {
+        "parsed": 18754,
+        "unparsed": 1
+      },
+      "tickers": {
+        "corrected_rows": 31
+      },
+      "splitting": {
+        "status_counts": {
+          "split_complete": 18354,
+          "qa_marker_missing": 251,
+          "qa_text_empty": 89,
+          "qa_text_too_short": 60,
+          "prepared_marker_missing": 1
+        },
+        "explicit_boundary_rows": 18503,
+        "explicit_boundary_rate": 0.9865635830445214,
+        "complete_row_rate": 0.9786190349240202
+      },
+      "events": {
+        "event_groups": 17544,
+        "status_row_counts": {
+          "unique": 16692,
+          "exact_duplicate": 1955,
+          "conflict": 107,
+          "unresolved_timestamp": 1
+        },
+        "conflict_groups": 49,
+        "transcript_conflict_groups": 48,
+        "metadata_only_conflict_groups": 1,
+        "safe_section_events": 17123,
+        "manual_review_rows": 1632
+      },
+      "section_lengths": {
+        "prepared_words_median": 3034.0,
+        "qa_words_median": 4756.0,
+        "prepared_words_min": 55,
+        "qa_words_min": 24
+      },
+      "output": {
+        "size_bytes": 269448329,
+        "sha256": "0afc207f7f95ced8d6c40820baeb381bf22c1261806b9b666babc7cbe089d2c8",
+        "rows": 17123
+      },
+      "decisions": [
+        "Only explicit Prepared Remarks and Questions/Answers headings were accepted.",
+        "Both sections must contain at least 20 words to enter the model-ready corpus.",
+        "No missing section boundary was inferred from speaker names or conversational text.",
+        "Event conflicts and incomplete splits were excluded from the section corpus.",
+        "The source pickle was read but not modified.",
+        "Unmatched trailing right parentheses were removed from ticker symbols while preserving the source value in the audit table."
+      ]
+    },
+    "phase3_finbert_quality": {
+      "phase": 3,
+      "status": "complete",
+      "input": {
+        "sha256": "0afc207f7f95ced8d6c40820baeb381bf22c1261806b9b666babc7cbe089d2c8",
+        "rows": 17123
+      },
+      "model": {
+        "model_id": "ProsusAI/finbert",
+        "model_revision": "0bc2ac10dda6929bcb1f77ccc43c7ec5c424f031",
+        "max_length": 512,
+        "stride": 64,
+        "aggregation": "new_token_weighted_mean_probability",
+        "precision": "cuda_float16",
+        "event_batch_size": 8,
+        "window_batch_size": 16,
+        "config_hash": "1a2535ffc20e4358b4ffc7a37cc4f481d3b63f5a808629ed7a13940050504a00"
+      },
+      "runtime": {
+        "device": "NVIDIA GeForce RTX 5060 Laptop GPU",
+        "torch_version": "2.11.0+cu128",
+        "transformers_version": "4.57.6",
+        "elapsed_seconds": 1111.9752822,
+        "newly_scored": 6659,
+        "resumed_rows": 10464,
+        "event_batch_size": 8,
+        "window_batch_size": 16
+      },
+      "scores": {
+        "rows": 17123,
+        "event_ids_unique": true,
+        "tone_pres": {
+          "min": -0.9357713985754046,
+          "mean": 0.42769546697879224,
+          "max": 0.9301004856802446
+        },
+        "tone_qa": {
+          "min": -0.5843769447773298,
+          "mean": 0.14801219239433844,
+          "max": 0.9191051451489329
+        },
+        "pres_windows": 157744,
+        "qa_windows": 241420
+      },
+      "output": {
+        "sha256": "5fa976c1351fab5c3a8d89af6322f056294fee4a8172708e690b33c759364c24",
+        "rows": 17123
+      }
+    },
+    "phase4_market_quality": {
+      "phase": 4,
+      "status": "complete_with_documented_gaps",
+      "input": {
+        "sha256": "5fa976c1351fab5c3a8d89af6322f056294fee4a8172708e690b33c759364c24",
+        "rows": 17123
+      },
+      "provider": {
+        "name": "Yahoo Finance via yfinance",
+        "yfinance_version": "1.7.0",
+        "download_status_counts": {
+          "cached": 2108,
+          "unavailable": 725
+        }
+      },
+      "config": {
+        "benchmark_ticker": "SPY",
+        "pre_window": 60,
+        "car_windows": [
+          5,
+          10,
+          60
+        ],
+        "price_field": "Adj Close",
+        "return_method": "arithmetic_sum",
+        "event_clock": "america_new_york",
+        "config_hash": "b673e0f0d26d3d71de86f9b67ae55db3ef746292c88343ea0bdf047d0eeb59c3"
+      },
+      "coverage": {
+        "events_total": 17123,
+        "events_complete": 13160,
+        "event_coverage_rate": 0.7685569117561175,
+        "event_status_counts": {
+          "complete": 13160,
+          "ticker_data_unavailable": 3878,
+          "missing_pre_event_market_data": 32,
+          "nonpositive_pre_event_market_data": 31,
+          "missing_response_start_return": 22
+        },
+        "event_tickers_total": 2832,
+        "event_tickers_with_bars": 2107,
+        "provider_symbols_total_including_benchmark": 2833
+      },
+      "definitions": {
+        "CAR_n": "sum of adjusted-close stock return minus SPY adjusted-close return over the first n tradable sessions after the call",
+        "PreRet_60": "sum of the 60 pre-event adjusted-close stock returns; this was mislabeled SUE_Proxy in the legacy dataset",
+        "VOL_60": "sample standard deviation of the same 60 pre-event stock returns",
+        "LogAvgVolume_60": "natural log of mean raw volume over the 60-session pre-event window",
+        "LogAvgDollarVolume_60": "natural log of mean Close times Volume over the 60-session pre-event window"
+      },
+      "legacy_alignment_audit": {
+        "comparable_events": 9993,
+        "comparisons": {
+          "PreRet_60_vs_legacy_SUE_Proxy": {
+            "rows": 9993,
+            "pearson_correlation": 0.08072495794279247,
+            "exact_within_1e_6": 84
+          },
+          "VOL_60_vs_legacy_VOL": {
+            "rows": 9993,
+            "pearson_correlation": 0.03636916272825648,
+            "exact_within_1e_6": 85
+          },
+          "LogAvgVolume_60_vs_legacy_Turnover": {
+            "rows": 9993,
+            "pearson_correlation": 0.06652624043802667,
+            "exact_within_1e_6": 82
+          },
+          "CAR_5_new_vs_old": {
+            "rows": 9993,
+            "pearson_correlation": 0.006370807119652593,
+            "exact_within_1e_6": 3
+          },
+          "CAR_10_new_vs_old": {
+            "rows": 9993,
+            "pearson_correlation": 0.022862078130324794,
+            "exact_within_1e_6": 3
+          },
+          "CAR_60_new_vs_old": {
+            "rows": 9993,
+            "pearson_correlation": 0.04121101241714838,
+            "exact_within_1e_6": 3
+          }
+        },
+        "conclusion": "legacy market columns are not event-aligned and must not be reused"
+      },
+      "runtime": {
+        "elapsed_seconds": 204.89054309999983
+      },
+      "output": {
+        "sha256": "fab5c41395d363896203f14c34a5b979c0ef7d4d8e9609b2de30b4921d628091",
+        "rows": 17123,
+        "complete_cases_sha256": "632ae20e218316e6a76e04da01d7d12fb1330d874a8289c1f34b625de78eeaa0",
+        "complete_cases_rows": 13160
+      }
+    },
+    "phase4_fundamental_quality": {
+      "phase": "4B",
+      "status": "complete_with_documented_gaps",
+      "provider": {
+        "name": "Yahoo Finance via yfinance",
+        "yfinance_version": "1.7.0",
+        "earnings_download_status": {
+          "cached": 2097
+        },
+        "shares_download_status": {
+          "cached": 2097
+        }
+      },
+      "config": {
+        "sue_history_quarters": 8,
+        "sue_min_history": 4,
+        "earnings_lookback_days": 3,
+        "max_share_staleness_days": 400,
+        "turnover_window": 60
+      },
+      "coverage": {
+        "market_complete_events": 13160,
+        "sue_complete_events": 11934,
+        "share_complete_events": 12887,
+        "analysis_ready_events": 11676,
+        "sue_status_counts": {
+          "complete": 11934,
+          "no_earnings_match": 609,
+          "insufficient_sue_history": 480,
+          "reported_eps_missing": 74,
+          "eps_estimate_missing": 60,
+          "invalid_sue_denominator": 3
+        },
+        "share_status_counts": {
+          "complete": 12887,
+          "shares_missing_or_stale": 273
+        }
+      },
+      "definitions": {
+        "SUE_Analyst_8Q": "current actual EPS minus consensus estimate, divided by the sample standard deviation of up to eight prior forecast errors; at least four prior errors required",
+        "Size_LogMarketCap": "natural log of unadjusted close times the latest shares observation available by the control date",
+        "Turnover_60_Mean": "mean daily raw volume divided by shares filtered by historical record date over the 60-session pre-event window",
+        "LogTurnover_60": "natural log of Turnover_60_Mean"
+      },
+      "runtime": {
+        "elapsed_seconds": 190.87652939999862
+      },
+      "output": {
+        "fundamental_features": {
+          "rows": 13160,
+          "sha256": "3e7b82d805294c952dbeb731c9ea719478e4c12b38ff7b82791c8fbb85804194"
+        },
+        "analysis_ready": {
+          "rows": 11676,
+          "sha256": "9ffd3ae88c8935f6164641849d5d6f6ba1e19a1a2a93502b76dc6a1cbb605808"
+        }
+      }
+    },
+    "phase5_modeling_quality": {
+      "phase": "5",
+      "status": "complete",
+      "analysis_unit": "one earnings-call event",
+      "config": {
+        "train_end": "2021-12-31",
+        "test_start": "2022-01-01",
+        "label_embargo_days": 95,
+        "winsor_lower": 0.01,
+        "winsor_upper": 0.99,
+        "random_seed": 42,
+        "n_estimators": 150,
+        "learning_rate": 0.03,
+        "max_depth": 3,
+        "subsample": 0.7,
+        "colsample_bytree": 0.7
+      },
+      "sample": {
+        "all_events": 11676,
+        "train_events": 7305,
+        "embargoed_events": 1567,
+        "training_label_embargo_days": 95,
+        "test_events": 2804,
+        "train_start": "2017-11-13",
+        "train_end": "2021-09-28",
+        "test_start": "2022-01-05",
+        "test_end": "2023-02-23",
+        "unique_tickers": 1950
+      },
+      "inference": {
+        "regression": "OLS with calendar-quarter fixed effects and ticker-clustered standard errors",
+        "multiplicity": "Benjamini-Hochberg FDR across all reported non-FE coefficients",
+        "claim_boundary": "associational, not causal"
+      },
+      "prediction": {
+        "target_training": "training outcomes clipped at train-period 1st/99th percentiles; test outcomes remain raw",
+        "rank_ic": "Spearman correlation; monthly mean uses test months with at least 20 events",
+        "portfolio_sort": "event-month top-minus-bottom quintile diagnostic; arithmetic cumulative spread, no costs and not a tradeable overlapping-position backtest",
+        "feature_importance": "common test-set permutation RMSE increase is the primary cross-model importance; native tree importances are retained only for audit",
+        "model_selection": "2020 and 2021 validation folds; each fold fits preprocessing and models on prior events with a 95-calendar-day CAR60 label embargo; 2022-2023 held out for final reporting",
+        "validation_months_by_year": {
+          "2020": 7,
+          "2021": 9
+        },
+        "selected_models": {
+          "CAR_10": "CatBoost",
+          "CAR_5": "CatBoost",
+          "CAR_60": "LightGBM"
+        },
+        "validation_selected_test_metrics": {
+          "CAR_5": {
+            "model": "CatBoost",
+            "rmse": 0.11091989645120495,
+            "directional_accuracy": 0.5606276747503567,
+            "pooled_rank_ic": 0.18482820372232603,
+            "monthly_rank_ic_mean": 0.2163634959778984,
+            "monthly_rank_ic_months": 14
+          },
+          "CAR_10": {
+            "model": "CatBoost",
+            "rmse": 0.13821951912756034,
+            "directional_accuracy": 0.5445791726105563,
+            "pooled_rank_ic": 0.1418987617576017,
+            "monthly_rank_ic_mean": 0.1678536291869612,
+            "monthly_rank_ic_months": 14
+          },
+          "CAR_60": {
+            "model": "LightGBM",
+            "rmse": 0.23895615785902097,
+            "directional_accuracy": 0.5181883024251069,
+            "pooled_rank_ic": 0.0822450854755605,
+            "monthly_rank_ic_mean": 0.09490757794272361,
+            "monthly_rank_ic_months": 14
+          }
+        }
+      },
+      "software": {
+        "pandas": "2.3.3",
+        "numpy": "2.5.4",
+        "scikit_learn": "1.9.1",
+        "statsmodels": "0.15.0",
+        "xgboost": "3.4.1",
+        "lightgbm": "4.7.0",
+        "catboost": "1.2.10"
+      },
+      "outputs": {
+        "validation_metrics": {
+          "rows": 36,
+          "sha256": "926cd8f0c40c570ae7f4b9a9bb0a6ebf6b697b4fbe6f54f8c4b622e6178e5a04"
+        },
+        "modeling_sample": {
+          "rows": 11676,
+          "sha256": "8925a6398ef3f5858a80b927cbd9093fa523530ef4a8e93a9e742424386bb6cb"
+        },
+        "transform_parameters": {
+          "rows": 7,
+          "sha256": "b7bf7d6c4d5274ba5fa47dfb958586de8e6228f139130908bfcfddd2c3676a94"
+        },
+        "target_clip_bounds": {
+          "rows": 3,
+          "sha256": "d758bcf0de2f36fe7bc3bca31dc2e19c7b1fbe5608f1c77f24c152f5182e81d8"
+        },
+        "descriptive": {
+          "rows": 10,
+          "sha256": "d4602982f1eeb2eeadf72665091700ad8774f26c81144844cf311a7e60a89792"
+        },
+        "correlations": {
+          "rows": 45,
+          "sha256": "1f9687113de958269a99ae45ce8e07cb48316c398e4bd0d7523082f3de6531ec"
+        },
+        "ols_coefficients": {
+          "rows": 63,
+          "sha256": "66d16af299be147d8b5616add13be5b7fc4eb2050cfb230da6eb4fc34ee7de4a"
+        },
+        "ols_models": {
+          "rows": 9,
+          "sha256": "46257c2698abedcb6aaf268d7bbf5e12ed5160e57f6666a8b85b64266d628122"
+        },
+        "metrics": {
+          "rows": 21,
+          "sha256": "10b96571ee7bd53832fdbf50eedd4cad5011ce9f0c3da2394ccf096d8579e3fe"
+        },
+        "predictions": {
+          "rows": 2804,
+          "sha256": "2789d6e2b036eced09f167df359f752139a23c34e2524c0523975f91799bed27"
+        },
+        "importance": {
+          "rows": 252,
+          "sha256": "fda9991b6f078d4d21e6dee9c4e09ff8e8a19667528c48c3373a58347a187b2c"
+        },
+        "portfolio_sorts": {
+          "rows": 168,
+          "sha256": "085d34c954ed4e1708edeec26c6c306a2d1f50eb96b301a1c211ed294b5882d9"
+        }
+      }
+    }
+  }
+}

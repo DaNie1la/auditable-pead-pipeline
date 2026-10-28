@@ -79,14 +79,19 @@ def main() -> None:
     for path in sorted((PROJECT_ROOT / "scripts").glob("run_phase*.py")):
         copy_file(path.relative_to(PROJECT_ROOT))
     copy_file(Path("scripts") / "build_portfolio_release.py")
+    for name in ("run_synthetic_demo.py", "build_public_audit.py", "build_public_figures.py"):
+        copy_file(Path("scripts") / name)
     for path in sorted((PROJECT_ROOT / "tests").glob("test_phase*.py")):
         copy_file(path.relative_to(PROJECT_ROOT))
     for name in REPORT_FILES:
         copy_file(Path("reports") / name)
+    copy_file(Path("reports") / "public_audit_summary.json")
+    for path in sorted((PROJECT_ROOT / "figures").glob("*.png")):
+        copy_file(path.relative_to(PROJECT_ROOT))
 
     release_files = sorted(path for path in RELEASE_ROOT.rglob("*") if path.is_file())
     for path in release_files:
-        if path.suffix.lower() in {".py", ".md", ".txt", ""}:
+        if path.suffix.lower() in {".py", ".md", ".txt", ".json", ""}:
             content = path.read_text(encoding="utf-8", errors="replace")
             sanitized = content
             for local_root in {
@@ -103,7 +108,7 @@ def main() -> None:
     for path in release_files:
         if path.suffix.lower() in FORBIDDEN_SUFFIXES:
             violations.append(f"forbidden suffix: {path.relative_to(RELEASE_ROOT)}")
-        if path.suffix.lower() in {".py", ".md", ".txt", ""}:
+        if path.suffix.lower() in {".py", ".md", ".txt", ".json", ""}:
             text = path.read_text(encoding="utf-8", errors="replace")
             for needle in FORBIDDEN_TEXT:
                 if needle in text:

@@ -55,6 +55,14 @@ def test_prepare_modeling_frame_is_strictly_chronological() -> None:
     assert result.loc[2, "Z_SUE_Analyst_8Q"] == 1.0
 
 
+def test_training_embargo_excludes_labels_crossing_test_boundary() -> None:
+    sample = _sample_frame().copy()
+    sample.loc[1, "event_timestamp_et"] = "2021-12-01 08:00:00-05:00"
+    result, transformer = prepare_modeling_frame(sample)
+    assert result["sample_split"].tolist() == ["train", "embargo", "test"]
+    assert transformer.bounds_.loc["SUE_Analyst_8Q", "upper"] == 0.0
+
+
 def test_safe_spearman_handles_constant_predictions() -> None:
     assert np.isnan(safe_spearman([1, 2, 3], [1, 1, 1]))
     assert safe_spearman([1, 2, 3], [1, 2, 3]) == 1.0

@@ -25,6 +25,7 @@ TARGETS = ["CAR_5", "CAR_10", "CAR_60"]
 class ModelingConfig:
     train_end: str = "2021-12-31"
     test_start: str = "2022-01-01"
+    label_embargo_days: int = 95  # Conservative buffer for the 60-trading-day CAR.
     winsor_lower: float = 0.01
     winsor_upper: float = 0.99
     random_seed: int = 42
@@ -117,6 +118,11 @@ def prepare_modeling_frame(
     )
     if result["sample_split"].eq("gap").any():
         raise ValueError("events fall into the gap between training and testing periods")
+    training_cutoff = test_start - pd.Timedelta(config.label_embargo_days, unit="D")
+    result.loc[
+        result["sample_split"].eq("train") & result["event_date"].gt(training_cutoff),
+        "sample_split",
+    ] = "embargo"
     source_features = FINANCIAL_FEATURES + TEXT_FEATURES
     transformer = TrainFittedTransformer(
         lower=config.winsor_lower, upper=config.winsor_upper
